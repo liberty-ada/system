@@ -1,0 +1,14 @@
+# Managed by Composer
+/vendor
+
+# Common IDEs
+/.idea
+
+# Local script file
+/local_script.php
+
+# Local environment settings
+/.env
+
+# Misc files
+.DS_Store

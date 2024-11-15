@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Library class with VERSION constant
+- Initial system library classes ported over for testing
 
 ## [0.0.1]
 

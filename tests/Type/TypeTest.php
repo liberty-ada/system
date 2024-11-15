@@ -11,6 +11,16 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Type::class)]
 class TypeTest extends UnitTestCase
 {
+    public function test_that_to_short_name_returns_expected_value()
+    {
+        $shortName = 'Type';
+        $canonical = 'Liberty.System.Type.Type';
+
+        $type = Type::of($canonical);
+
+        self::assertSame($shortName, $type->toShortName());
+    }
+
     public function test_that_to_class_name_returns_expected_value()
     {
         $className = 'Liberty\\System\\Type\\Type';
@@ -19,6 +29,25 @@ class TypeTest extends UnitTestCase
         $type = Type::of($canonical);
 
         self::assertSame($className, $type->toClassName());
+    }
+
+    public function test_that_to_underscored_returns_expected_value()
+    {
+        $underscored = 'liberty.system.type.type';
+        $canonical = 'Liberty.System.Type.Type';
+
+        $type = Type::of($canonical);
+
+        self::assertSame($underscored, $type->toUnderscored());
+    }
+
+    public function test_that_to_canonical_returns_expected_value()
+    {
+        $canonical = 'Liberty.System.Type.Type';
+
+        $type = Type::of($canonical);
+
+        self::assertSame($canonical, $type->toCanonical());
     }
 
     public function test_that_to_string_returns_expected_value()

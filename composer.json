@@ -3,7 +3,7 @@
     "description": "Liberty System Library",
     "license": "MIT",
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
         "ext-simplexml": "*"
     },
     "require-dev": {
@@ -27,7 +27,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.16"
+            "php": "8.3.13"
         },
         "preferred-install": {
             "*": "dist"

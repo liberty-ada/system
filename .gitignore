@@ -1,14 +1,19 @@
+# Composer lock file and phar
+# should be ignored by libraries
+/composer.phar
+/composer.lock
+
 # Managed by Composer
 /vendor
 
 # Common IDEs
 /.idea
+/nbproject/
+/*.sublime-project
+/*.sublime-workspace
 
 # Local script file
 /local_script.php
-
-# Local environment settings
-/.env
 
 # Misc files
 .DS_Store

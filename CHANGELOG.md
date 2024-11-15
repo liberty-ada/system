@@ -15,4 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CHANGELOG, LICENSE, README.md
 
 [Unreleased]: https://github.com/liberty-ada/system/compare/0.0.1...HEAD
-[0.0.1]: https://github.com/liberty-ada/system/releases/tag/0.0.1
+[0.0.1]: https://github.com/liberty-ada/system/commit/f0c337be51cd5e3ff1bc196c77328cd8627b847a

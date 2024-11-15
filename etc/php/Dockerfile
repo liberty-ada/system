@@ -16,5 +16,4 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /vat/tmp/*
 
-RUN echo 'zend.assertions = 1' >> /usr/local/etc/php/conf.d/custom.ini \
-    && echo 'xdebug.mode = coverage' >> /usr/local/etc/php/conf.d/custom.ini \
+COPY ./conf/custom.ini /usr/local/etc/php/conf.d/custom.ini

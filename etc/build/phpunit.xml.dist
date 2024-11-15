@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="../../vendor/autoload.php"
+         cacheDirectory="../../var/cache"
+         requireCoverageMetadata="true">
+    <php>
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+        <env name="APP_ENV" value="test" force="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="complete">
+            <directory>../../tests</directory>
+        </testsuite>
+    </testsuites>
+    <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <directory suffix=".php">../../src</directory>
+        </include>
+    </source>
+    <logging>
+        <junit outputFile="../../var/reports/artifacts/junit.xml"/>
+    </logging>
+    <coverage>
+        <report>
+            <clover outputFile="../../var/reports/artifacts/clover.xml"/>
+            <html outputDirectory="../../var/reports/coverage" lowUpperBound="35" highLowerBound="70"/>
+            <php outputFile="../../var/reports/artifacts/coverage.php" />
+            <text outputFile="../../var/reports/artifacts/coverage.txt" showUncoveredFiles="true" showOnlySummary="false" />
+            <xml outputDirectory="../../var/reports/xml-coverage" />
+        </report>
+    </coverage>
+</phpunit>

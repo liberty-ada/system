@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# change to the project root
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd $DIR/..
+
+docker build -t liberty-system -q ./etc/php/ > /dev/null
+
+echo "#== PHP Version ==#"
+
+docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php -v
+
+echo "#== Update Composer Dependencies ==#"
+
+docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -v ~/.composer:/tmp \
+    --user $(id -u):$(id -g) \
+    composer:2 update
+
+echo "#== PHP Lint ==#"
+
+docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php vendor/bin/phplint src \
+    --verbose --no-cache --no-configuration
+
+echo "#== PhpUnit Tests ==#"
+
+docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php vendor/bin/phpunit \
+    --configuration etc/build
+
+echo "#== PHP Code Style ==#"
+
+docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php vendor/bin/phpcs src \
+    -s -p --standard=PSR12

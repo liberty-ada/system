@@ -16,21 +16,21 @@ class VarPrinterTest extends UnitTestCase
     {
         $expected = 'NULL';
 
-        static::assertSame($expected, VarPrinter::toString(null));
+        self::assertSame($expected, VarPrinter::toString(null));
     }
 
     public function test_that_to_string_returns_expected_string_for_true()
     {
         $expected = 'TRUE';
 
-        static::assertSame($expected, VarPrinter::toString(true));
+        self::assertSame($expected, VarPrinter::toString(true));
     }
 
     public function test_that_to_string_returns_expected_string_for_false()
     {
         $expected = 'FALSE';
 
-        static::assertSame($expected, VarPrinter::toString(false));
+        self::assertSame($expected, VarPrinter::toString(false));
     }
 
     public function test_that_to_string_returns_expected_string_for_std_class()
@@ -38,7 +38,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = 'Object(stdClass)';
         $object = new \StdClass();
 
-        static::assertSame($expected, VarPrinter::toString($object));
+        self::assertSame($expected, VarPrinter::toString($object));
     }
 
     public function test_that_to_string_returns_expected_string_for_anon_function()
@@ -46,7 +46,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = 'Function';
         $function = function () { };
 
-        static::assertSame($expected, VarPrinter::toString($function));
+        self::assertSame($expected, VarPrinter::toString($function));
     }
 
     public function test_that_to_string_returns_expected_string_for_datetime()
@@ -54,7 +54,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = 'DateTime(2015-01-01T00:00:00+00:00)';
         $dateTime = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
 
-        static::assertSame($expected, VarPrinter::toString($dateTime));
+        self::assertSame($expected, VarPrinter::toString($dateTime));
     }
 
     public function test_that_to_string_returns_expected_string_for_cast_object()
@@ -62,7 +62,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = __FILE__;
         $object = new \SplFileInfo(__FILE__);
 
-        static::assertSame($expected, VarPrinter::toString($object));
+        self::assertSame($expected, VarPrinter::toString($object));
     }
 
     public function test_that_to_string_returns_expected_string_for_object_to_string()
@@ -70,7 +70,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = 'Liberty.System.Utility.VarPrinter';
         $type = Type::of(VarPrinter::class);
 
-        static::assertSame($expected, VarPrinter::toString($type));
+        self::assertSame($expected, VarPrinter::toString($type));
     }
 
     public function test_that_to_string_returns_expected_string_for_exception()
@@ -84,7 +84,7 @@ class VarPrinterTest extends UnitTestCase
             'line'    => $line
         ], JSON_UNESCAPED_SLASHES));
 
-        static::assertSame($expected, VarPrinter::toString($object));
+        self::assertSame($expected, VarPrinter::toString($object));
     }
 
     public function test_that_to_string_returns_expected_string_for_simple_array()
@@ -92,7 +92,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = 'Array(0 => foo, 1 => bar, 2 => baz)';
         $data = ['foo', 'bar', 'baz'];
 
-        static::assertSame($expected, VarPrinter::toString($data));
+        self::assertSame($expected, VarPrinter::toString($data));
     }
 
     public function test_that_to_string_returns_expected_string_for_assoc_array()
@@ -100,7 +100,7 @@ class VarPrinterTest extends UnitTestCase
         $expected = 'Array(foo => bar)';
         $data = ['foo' => 'bar'];
 
-        static::assertSame($expected, VarPrinter::toString($data));
+        self::assertSame($expected, VarPrinter::toString($data));
     }
 
     public function test_that_to_string_returns_expected_string_for_resource()
@@ -108,7 +108,7 @@ class VarPrinterTest extends UnitTestCase
         $resource = fopen(__FILE__, 'r');
         $expected = sprintf('Resource(%d:stream)', get_resource_id($resource));
 
-        static::assertSame($expected, VarPrinter::toString($resource));
+        self::assertSame($expected, VarPrinter::toString($resource));
 
         fclose($resource);
     }

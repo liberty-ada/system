@@ -216,6 +216,18 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     }
 
     /**
+     * Applies a callback function to every item.
+     *
+     * @param callable(T, int): void $callback
+     */
+    public function each(callable $callback): void
+    {
+        foreach ($this->items as $index => $item) {
+            call_user_func($callback, $item, $index);
+        }
+    }
+
+    /**
      * Creates a collection from the results of a function.
      *
      * @template U
@@ -301,18 +313,6 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
         }
 
         return [$list1, $list2];
-    }
-
-    /**
-     * Applies a callback function to every item.
-     *
-     * @param callable(T, int): void $callback
-     */
-    public function each(callable $callback): void
-    {
-        foreach ($this->items as $index => $item) {
-            call_user_func($callback, $item, $index);
-        }
     }
 
     /**

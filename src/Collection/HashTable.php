@@ -235,6 +235,18 @@ final class HashTable implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
+     * Applies a callback function to every value.
+     *
+     * @param callable(V, K): void $callback
+     */
+    public function each(callable $callback): void
+    {
+        foreach ($this->getIterator() as $key => $value) {
+            call_user_func($callback, $value, $key);
+        }
+    }
+
+    /**
      * Creates a collection from the results of a function.
      *
      * Keys are not affected.
@@ -322,18 +334,6 @@ final class HashTable implements ArrayAccess, Countable, IteratorAggregate
         }
 
         return [$table1, $table2];
-    }
-
-    /**
-     * Applies a callback function to every value.
-     *
-     * @param callable(V, K): void $callback
-     */
-    public function each(callable $callback): void
-    {
-        foreach ($this->getIterator() as $key => $value) {
-            call_user_func($callback, $value, $key);
-        }
     }
 
     /**

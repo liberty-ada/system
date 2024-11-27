@@ -219,6 +219,18 @@ final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonS
     }
 
     /**
+     * Applies a callback function to every item.
+     *
+     * @param callable(T, int): void $callback
+     */
+    public function each(callable $callback): void
+    {
+        foreach ($this->list as $index => $item) {
+            call_user_func($callback, $item, $index);
+        }
+    }
+
+    /**
      * Creates a collection from the results of a function.
      *
      * @template U
@@ -304,18 +316,6 @@ final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonS
         }
 
         return [$list1, $list2];
-    }
-
-    /**
-     * Applies a callback function to every item.
-     *
-     * @param callable(T, int): void $callback
-     */
-    public function each(callable $callback): void
-    {
-        foreach ($this->list as $index => $item) {
-            call_user_func($callback, $item, $index);
-        }
     }
 
     /**
@@ -787,6 +787,15 @@ final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonS
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    /**
+     * Handles deep cloning.
+     */
+    public function __clone(): void
+    {
+        $list = clone $this->list;
+        $this->list = $list;
     }
 
     /**

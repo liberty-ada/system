@@ -229,6 +229,18 @@ final class HashSet implements Arrayable, Countable, IteratorAggregate, JsonSeri
     }
 
     /**
+     * Applies a callback function to every item.
+     *
+     * @param callable(T, int): void $callback
+     */
+    public function each(callable $callback): void
+    {
+        foreach ($this->getIterator() as $index => $item) {
+            call_user_func($callback, $item, $index);
+        }
+    }
+
+    /**
      * Creates a collection from the results of a function.
      *
      * @template U
@@ -314,18 +326,6 @@ final class HashSet implements Arrayable, Countable, IteratorAggregate, JsonSeri
         }
 
         return [$set1, $set2];
-    }
-
-    /**
-     * Applies a callback function to every item.
-     *
-     * @param callable(T, int): void $callback
-     */
-    public function each(callable $callback): void
-    {
-        foreach ($this->getIterator() as $index => $item) {
-            call_user_func($callback, $item, $index);
-        }
     }
 
     /**

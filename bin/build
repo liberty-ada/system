@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# change to the project root
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd $DIR/..
+
+minCoverage=6
+
+if docker build -t liberty-system -q ./etc/php/ > /dev/null; then
+    echo "#== Docker Ready ==#"
+    echo ""
+else
+    echo "#== Docker Build Failed ==#"
+    exit 1
+fi
+
+echo "#== PHP Version ==#"
+
+docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php -v
+echo ""
+
+echo "#== Update Composer Dependencies ==#"
+
+if docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -v ~/.composer:/tmp \
+    --user $(id -u):$(id -g) \
+    composer:2 update; then
+    echo ""
+else
+    exit 1
+fi
+
+echo "#== PHP Lint ==#"
+
+if docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php vendor/bin/phplint src \
+    --verbose --no-cache --no-configuration; then
+    echo ""
+else
+    exit 1
+fi
+
+echo "#== PhpUnit Tests ==#"
+
+if docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php vendor/bin/phpunit \
+    --configuration etc/build; then
+    echo ""
+else
+    exit 1
+fi
+
+echo "#== PhpUnit Test Coverage ==#"
+
+if docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php tests/coverage.php $minCoverage; then
+    echo ""
+else
+    exit 1
+fi
+
+echo "#== PHP Code Style ==#"
+
+if docker container run \
+    --rm -it \
+    -v $(pwd):/app:delegated \
+    -w /app \
+    liberty-system php vendor/bin/phpcs src \
+    -s -p --standard=PSR12; then
+    echo "#== BUILD COMPLETE ==#"
+else
+    exit 1
+fi

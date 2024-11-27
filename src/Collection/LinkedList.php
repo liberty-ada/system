@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Liberty\System\Collection;
 
-use ArrayAccess;
-use ArrayIterator;
 use Closure;
 use Countable;
 use IteratorAggregate;
+use IteratorIterator;
 use JsonSerializable;
 use Liberty\System\Exception\SystemException;
 use Liberty\System\Type\Arrayable;
 use Liberty\System\Utility\Validate;
+use SplDoublyLinkedList;
 use Traversable;
 
 /**
- * Class ArrayList
+ * Class LinkedList
  *
  * @template T of mixed
  */
-final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable
+final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonSerializable
 {
     private ?string $itemType;
-    private array $items = [];
+    private SplDoublyLinkedList $list;
 
     /**
-     * Constructs ArrayList
+     * Constructs LinkedList
      *
      * If a type is not provided, the item type is dynamic.
      *
@@ -37,12 +37,15 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     public function __construct(?string $itemType = null)
     {
         $this->setItemType($itemType);
+        $this->list = new SplDoublyLinkedList();
+        $mode = SplDoublyLinkedList::IT_MODE_FIFO | SplDoublyLinkedList::IT_MODE_KEEP;
+        $this->list->setIteratorMode($mode);
     }
 
     /**
-     * Creates ArrayList instance.
+     * Creates LinkedList instance.
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public static function of(?string $itemType = null): self
     {
@@ -64,7 +67,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function isEmpty(): bool
     {
-        return empty($this->items);
+        return $this->list->isEmpty();
     }
 
     /**
@@ -72,7 +75,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function count(): int
     {
-        return count($this->items);
+        return count($this->list);
     }
 
     /**
@@ -80,7 +83,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function length(): int
     {
-        return count($this->items);
+        return count($this->list);
     }
 
     /**
@@ -93,7 +96,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     public function add(mixed $item): void
     {
         assert(Validate::isType($item, $this->itemType));
-        $this->items[] = $item;
+        $this->list->push($item);
     }
 
     /**
@@ -101,7 +104,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @param list<T> $items
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function replace(iterable $items = []): self
     {
@@ -117,12 +120,12 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Creates an instance sorted using a comparator function.
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function sort(callable $comparator): self
     {
         $list = self::of($this->itemType);
-        $items = $this->items;
+        $items = $this->toArray();
 
         usort($items, $comparator);
 
@@ -136,7 +139,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Creates an instance in reverse order.
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function reverse(): self
     {
@@ -156,14 +159,14 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @param callable(T, int): string|null $callback
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function unique(?callable $callback = null): self
     {
         if ($callback === null) {
             $list = self::of($this->itemType);
 
-            $items = array_values(array_unique($this->items, SORT_REGULAR));
+            $items = array_values(array_unique($this->toArray(), SORT_REGULAR));
 
             foreach ($items as $item) {
                 $list->add($item);
@@ -190,13 +193,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Creates a collection from a slice of items.
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function slice(int $index, ?int $length = null): self
     {
         $list = self::of($this->itemType);
 
-        $items = array_slice($this->items, $index, $length);
+        $items = array_slice($this->toArray(), $index, $length);
 
         foreach ($items as $item) {
             $list->add($item);
@@ -208,7 +211,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Creates a paginated collection.
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function page(int $page, int $perPage): self
     {
@@ -223,13 +226,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      * @param callable(T, int): U         $callback
      * @param class-string<U>|string|null $itemType
      *
-     * @return ArrayList<U>|ArrayList
+     * @return LinkedList<U>|LinkedList
      */
     public function map(callable $callback, ?string $itemType = null): self
     {
         $list = self::of($itemType);
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             $list->add(call_user_func($callback, $item, $index));
         }
 
@@ -241,13 +244,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @param callable(T, int): bool $predicate
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function filter(callable $predicate): self
     {
         $list = self::of($this->itemType);
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (call_user_func($predicate, $item, $index)) {
                 $list->add($item);
             }
@@ -261,13 +264,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @param callable(T, int): bool $predicate
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      */
     public function reject(callable $predicate): self
     {
         $list = self::of($this->itemType);
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (!call_user_func($predicate, $item, $index)) {
                 $list->add($item);
             }
@@ -285,14 +288,14 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @param callable(T, int): bool $predicate
      *
-     * @return ArrayList<T>[]|ArrayList[]
+     * @return LinkedList<T>[]|LinkedList[]
      */
     public function partition(callable $predicate): array
     {
         $list1 = self::of($this->itemType);
         $list2 = self::of($this->itemType);
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (call_user_func($predicate, $item, $index)) {
                 $list1->add($item);
             } else {
@@ -310,7 +313,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function each(callable $callback): void
     {
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             call_user_func($callback, $item, $index);
         }
     }
@@ -332,12 +335,10 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
                 return $default;
             }
 
-            $key = array_key_first($this->items);
-
-            return $this->items[$key];
+            return $this->list->bottom();
         }
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (call_user_func($predicate, $item, $index)) {
                 return $item;
             }
@@ -363,16 +364,23 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
                 return $default;
             }
 
-            $key = array_key_last($this->items);
-
-            return $this->items[$key];
+            return $this->list->top();
         }
 
-        foreach (array_reverse($this->items, true) as $index => $item) {
+        $reverse = SplDoublyLinkedList::IT_MODE_LIFO | SplDoublyLinkedList::IT_MODE_KEEP;
+        $forward = SplDoublyLinkedList::IT_MODE_FIFO | SplDoublyLinkedList::IT_MODE_KEEP;
+
+        $this->list->setIteratorMode($reverse);
+
+        foreach ($this->list as $index => $item) {
             if (call_user_func($predicate, $item, $index)) {
+                $this->list->setIteratorMode($forward);
+
                 return $item;
             }
         }
+
+        $this->list->setIteratorMode($forward);
 
         return $default;
     }
@@ -387,7 +395,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     public function indexOf(mixed $object): ?int
     {
         if (!($object instanceof Closure)) {
-            $key = array_search($object, $this->items, $strict = true);
+            $key = array_search($object, $this->toArray(), $strict = true);
 
             if ($key === false) {
                 return null;
@@ -396,7 +404,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
             return $key;
         }
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (call_user_func($object, $item, $index)) {
                 return $index;
             }
@@ -415,7 +423,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     public function lastIndexOf(mixed $object): ?int
     {
         if (!($object instanceof Closure)) {
-            $key = array_search($object, array_reverse($this->items, true), $strict = true);
+            $key = array_search($object, array_reverse($this->toArray(), true), $strict = true);
 
             if ($key === false) {
                 return null;
@@ -424,11 +432,20 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
             return $key;
         }
 
-        foreach (array_reverse($this->items, true) as $index => $item) {
+        $reverse = SplDoublyLinkedList::IT_MODE_LIFO | SplDoublyLinkedList::IT_MODE_KEEP;
+        $forward = SplDoublyLinkedList::IT_MODE_FIFO | SplDoublyLinkedList::IT_MODE_KEEP;
+
+        $this->list->setIteratorMode($reverse);
+
+        foreach ($this->list as $index => $item) {
             if (call_user_func($object, $item, $index)) {
+                $this->list->setIteratorMode($forward);
+
                 return $index;
             }
         }
+
+        $this->list->setIteratorMode($forward);
 
         return null;
     }
@@ -448,7 +465,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
             $maxItem = null;
             $max = null;
 
-            foreach ($this->items as $index => $item) {
+            foreach ($this->list as $index => $item) {
                 $field = call_user_func($callback, $item, $index);
                 if ($max === null || $field > $max) {
                     $max = $field;
@@ -483,7 +500,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
             $minItem = null;
             $min = null;
 
-            foreach ($this->items as $index => $item) {
+            foreach ($this->list as $index => $item) {
                 $field = call_user_func($callback, $item, $index);
                 if ($min === null || $field < $min) {
                     $min = $field;
@@ -517,7 +534,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     {
         $accumulator = $initial;
 
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             $accumulator = call_user_func($callback, $accumulator, $item, $index);
         }
 
@@ -577,7 +594,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function find(callable $predicate): mixed
     {
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (call_user_func($predicate, $item, $index)) {
                 return $item;
             }
@@ -594,7 +611,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function contains(mixed $item, bool $strict = true): bool
     {
-        return in_array($item, $this->items, $strict);
+        return in_array($item, $this->toArray(), $strict);
     }
 
     /**
@@ -604,7 +621,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function any(callable $predicate): bool
     {
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (call_user_func($predicate, $item, $index)) {
                 return true;
             }
@@ -620,138 +637,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function every(callable $predicate): bool
     {
-        foreach ($this->items as $index => $item) {
+        foreach ($this->list as $index => $item) {
             if (!call_user_func($predicate, $item, $index)) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    /**
-     * Retrieves an item at a specific index.
-     *
-     * @return T
-     *
-     * @throws SystemException When the requested index is out of bounds
-     */
-    public function get(int $index): mixed
-    {
-        $index = $this->getRealOffset($index);
-
-        return $this->items[$index];
-    }
-
-    /**
-     * Sets an item at a specific index.
-     *
-     * @param int        $index
-     * @param T          $item
-     *
-     * @throws SystemException When the requested index is out of bounds
-     *
-     * @phpstan-assert T $item
-     */
-    public function set(int $index, mixed $item): void
-    {
-        assert(Validate::isType($item, $this->itemType()));
-
-        $index = $this->getRealOffset($index);
-
-        $this->items[$index] = $item;
-    }
-
-    /**
-     * Checks if an index is in bounds.
-     */
-    public function has(int $index): bool
-    {
-        $count = count($this->items);
-
-        if ($index < -$count || $index > $count - 1) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Removes an item at a specific index.
-     */
-    public function remove(int $index): void
-    {
-        $count = count($this->items);
-
-        if ($index < -$count || $index > $count - 1) {
-            return;
-        }
-
-        if ($index < 0) {
-            $index += $count;
-        }
-
-        array_splice($this->items, $index, 1);
-    }
-
-    /**
-     * Retrieves an item at a specific index.
-     *
-     * @param int          $offset
-     *
-     * @throws SystemException When the requested index is out of bounds
-     *
-     * @phpstan-assert int $offset
-     */
-    public function offsetGet(mixed $offset): mixed
-    {
-        assert(Validate::isInt($offset));
-
-        return $this->get($offset);
-    }
-
-    /**
-     * Sets an item at a specific index.
-     *
-     * @param int               $offset
-     * @param T                 $value
-     *
-     * @throws SystemException When the requested index is out of bounds
-     *
-     * @phpstan-assert int|null $offset
-     * @phpstan-assert T        $value
-     */
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        if ($offset === null) {
-            $this->add($value);
-        }
-
-        assert(Validate::isInt($offset));
-        $this->set($offset, $value);
-    }
-
-    /**
-     * Checks if an index is in bounds.
-     *
-     * @phpstan-assert int $offset
-     */
-    public function offsetExists(mixed $offset): bool
-    {
-        assert(Validate::isInt($offset));
-
-        return $this->has($offset);
-    }
-
-    /**
-     * Removes an item at a specific index.
-     *
-     * @phpstan-assert int $offset
-     */
-    public function offsetUnset(mixed $offset): void
-    {
-        assert(Validate::isInt($offset));
-        $this->remove($offset);
     }
 
     /**
@@ -767,25 +659,23 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
             throw new SystemException('List underflow');
         }
 
-        $key = array_key_first($this->items);
-
-        return $this->items[$key];
+        return $this->list->bottom();
     }
 
     /**
      * Retrieves the tail of the list.
      *
-     * @return ArrayList<T>|ArrayList
+     * @return LinkedList<T>|LinkedList
      * @throws SystemException When the list is empty
      *
      */
-    public function tail(): ArrayList
+    public function tail(): LinkedList
     {
         if ($this->isEmpty()) {
             throw new SystemException('List underflow');
         }
 
-        $items = $this->items;
+        $items = $this->toArray();
         array_shift($items);
 
         $list = self::of($this->itemType);
@@ -802,7 +692,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function rewind(): void
     {
-        reset($this->items);
+        $this->list->rewind();
     }
 
     /**
@@ -810,7 +700,15 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function end(): void
     {
-        end($this->items);
+        if (!$this->valid()) {
+            $this->rewind();
+        }
+
+        while ($this->valid()) {
+            $this->next();
+        }
+
+        $this->prev();
     }
 
     /**
@@ -818,7 +716,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function valid(): bool
     {
-        return key($this->items) !== null;
+        return $this->list->valid();
     }
 
     /**
@@ -826,7 +724,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function next(): void
     {
-        next($this->items);
+        $this->list->next();
     }
 
     /**
@@ -834,7 +732,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function prev(): void
     {
-        prev($this->items);
+        $this->list->prev();
     }
 
     /**
@@ -842,7 +740,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function key(): ?int
     {
-        return key($this->items);
+        return is_int($this->list->key()) ? $this->list->key() : null;
     }
 
     /**
@@ -850,11 +748,11 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function current(): mixed
     {
-        if (key($this->items) === null) {
+        if ($this->key() === null) {
             return null;
         }
 
-        return current($this->items);
+        return $this->list->current();
     }
 
     /**
@@ -864,7 +762,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function toArray(): array
     {
-        return $this->items;
+        $items = [];
+
+        foreach ($this->getIterator() as $item) {
+            $item[] = $item;
+        }
+
+        return $items;
     }
 
     /**
@@ -874,7 +778,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->items);
+        return new IteratorIterator($this->list);
     }
 
     /**
@@ -897,26 +801,5 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     private function setItemType(?string $itemType = null): void
     {
         $this->itemType = $itemType;
-    }
-
-    /**
-     * Retrieves the real offset.
-     *
-     * @throws SystemException When the requested index is out of bounds
-     */
-    private function getRealOffset(int $index): int
-    {
-        $count = count($this->items);
-
-        if ($index < -$count || $index > $count - 1) {
-            $message = sprintf('Index (%d) out of range[%d, %d]', $index, -$count, $count - 1);
-            throw new SystemException($message);
-        }
-
-        if ($index < 0) {
-            $index += $count;
-        }
-
-        return $index;
     }
 }

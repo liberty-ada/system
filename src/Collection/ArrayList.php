@@ -86,7 +86,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Appends an item to the list.
      *
-     * @param T          $item
+     * @param T $item
      *
      * @phpstan-assert T $item
      */
@@ -646,8 +646,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Sets an item at a specific index.
      *
-     * @param int        $index
-     * @param T          $item
+     * @param int $index
+     * @param T   $item
      *
      * @throws SystemException When the requested index is out of bounds
      *
@@ -697,7 +697,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Retrieves an item at a specific index.
      *
-     * @param int          $offset
+     * @param int $offset
      *
      * @throws SystemException When the requested index is out of bounds
      *
@@ -713,8 +713,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Sets an item at a specific index.
      *
-     * @param int               $offset
-     * @param T                 $value
+     * @param int $offset
+     * @param T   $value
      *
      * @throws SystemException When the requested index is out of bounds
      *
@@ -758,8 +758,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      * Retrieves the head of the list.
      *
      * @return T
-     * @throws SystemException When the list is empty
      *
+     * @throws SystemException When the list is empty
      */
     public function head(): mixed
     {
@@ -776,8 +776,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      * Retrieves the tail of the list.
      *
      * @return ArrayList<T>|ArrayList
-     * @throws SystemException When the list is empty
      *
+     * @throws SystemException When the list is empty
      */
     public function tail(): ArrayList
     {

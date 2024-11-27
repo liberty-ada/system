@@ -89,7 +89,7 @@ final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonS
     /**
      * Appends an item to the list.
      *
-     * @param T          $item
+     * @param T $item
      *
      * @phpstan-assert T $item
      */
@@ -650,8 +650,8 @@ final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonS
      * Retrieves the head of the list.
      *
      * @return T
-     * @throws SystemException When the list is empty
      *
+     * @throws SystemException When the list is empty
      */
     public function head(): mixed
     {
@@ -666,8 +666,8 @@ final class LinkedList implements Arrayable, Countable, IteratorAggregate, JsonS
      * Retrieves the tail of the list.
      *
      * @return LinkedList<T>|LinkedList
-     * @throws SystemException When the list is empty
      *
+     * @throws SystemException When the list is empty
      */
     public function tail(): LinkedList
     {

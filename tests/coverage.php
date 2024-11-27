@@ -11,7 +11,7 @@ require_once $autoload;
 
 $cloverXmlFile = dirname(__DIR__).'/var/reports/artifacts/clover.xml';
 if (!file_exists($cloverXmlFile)) {
-    throw new RuntimeException('PhpUnit clover.xml report is required');
+    throw new RuntimeException('PHPUnit clover.xml report is required');
 }
 
 $cloverXml = new SimpleXMLElement(file_get_contents($cloverXmlFile));

@@ -12,68 +12,68 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(VarPrinter::class)]
 class VarPrinterTest extends UnitTestCase
 {
-    public function test_that_to_string_returns_expected_string_for_null()
+    public function test_that_to_string_returns_expected_string_for_null(): void
     {
         $expected = 'NULL';
 
-        static::assertSame($expected, VarPrinter::toString(null));
+        self::assertSame($expected, VarPrinter::toString(null));
     }
 
-    public function test_that_to_string_returns_expected_string_for_true()
+    public function test_that_to_string_returns_expected_string_for_true(): void
     {
         $expected = 'TRUE';
 
-        static::assertSame($expected, VarPrinter::toString(true));
+        self::assertSame($expected, VarPrinter::toString(true));
     }
 
-    public function test_that_to_string_returns_expected_string_for_false()
+    public function test_that_to_string_returns_expected_string_for_false(): void
     {
         $expected = 'FALSE';
 
-        static::assertSame($expected, VarPrinter::toString(false));
+        self::assertSame($expected, VarPrinter::toString(false));
     }
 
-    public function test_that_to_string_returns_expected_string_for_std_class()
+    public function test_that_to_string_returns_expected_string_for_std_class(): void
     {
         $expected = 'Object(stdClass)';
         $object = new \StdClass();
 
-        static::assertSame($expected, VarPrinter::toString($object));
+        self::assertSame($expected, VarPrinter::toString($object));
     }
 
-    public function test_that_to_string_returns_expected_string_for_anon_function()
+    public function test_that_to_string_returns_expected_string_for_anon_function(): void
     {
         $expected = 'Function';
         $function = function () { };
 
-        static::assertSame($expected, VarPrinter::toString($function));
+        self::assertSame($expected, VarPrinter::toString($function));
     }
 
-    public function test_that_to_string_returns_expected_string_for_datetime()
+    public function test_that_to_string_returns_expected_string_for_datetime(): void
     {
         $expected = 'DateTime(2015-01-01T00:00:00+00:00)';
         $dateTime = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
 
-        static::assertSame($expected, VarPrinter::toString($dateTime));
+        self::assertSame($expected, VarPrinter::toString($dateTime));
     }
 
-    public function test_that_to_string_returns_expected_string_for_cast_object()
+    public function test_that_to_string_returns_expected_string_for_cast_object(): void
     {
         $expected = __FILE__;
         $object = new \SplFileInfo(__FILE__);
 
-        static::assertSame($expected, VarPrinter::toString($object));
+        self::assertSame($expected, VarPrinter::toString($object));
     }
 
-    public function test_that_to_string_returns_expected_string_for_object_to_string()
+    public function test_that_to_string_returns_expected_string_for_object_to_string(): void
     {
         $expected = 'Liberty.System.Utility.VarPrinter';
         $type = Type::of(VarPrinter::class);
 
-        static::assertSame($expected, VarPrinter::toString($type));
+        self::assertSame($expected, VarPrinter::toString($type));
     }
 
-    public function test_that_to_string_returns_expected_string_for_exception()
+    public function test_that_to_string_returns_expected_string_for_exception(): void
     {
         $line = __LINE__ + 1;
         $object = new \RuntimeException('Something went wrong', 31337);
@@ -84,31 +84,31 @@ class VarPrinterTest extends UnitTestCase
             'line'    => $line
         ], JSON_UNESCAPED_SLASHES));
 
-        static::assertSame($expected, VarPrinter::toString($object));
+        self::assertSame($expected, VarPrinter::toString($object));
     }
 
-    public function test_that_to_string_returns_expected_string_for_simple_array()
+    public function test_that_to_string_returns_expected_string_for_simple_array(): void
     {
         $expected = 'Array(0 => foo, 1 => bar, 2 => baz)';
         $data = ['foo', 'bar', 'baz'];
 
-        static::assertSame($expected, VarPrinter::toString($data));
+        self::assertSame($expected, VarPrinter::toString($data));
     }
 
-    public function test_that_to_string_returns_expected_string_for_assoc_array()
+    public function test_that_to_string_returns_expected_string_for_assoc_array(): void
     {
         $expected = 'Array(foo => bar)';
         $data = ['foo' => 'bar'];
 
-        static::assertSame($expected, VarPrinter::toString($data));
+        self::assertSame($expected, VarPrinter::toString($data));
     }
 
-    public function test_that_to_string_returns_expected_string_for_resource()
+    public function test_that_to_string_returns_expected_string_for_resource(): void
     {
         $resource = fopen(__FILE__, 'r');
         $expected = sprintf('Resource(%d:stream)', get_resource_id($resource));
 
-        static::assertSame($expected, VarPrinter::toString($resource));
+        self::assertSame($expected, VarPrinter::toString($resource));
 
         fclose($resource);
     }

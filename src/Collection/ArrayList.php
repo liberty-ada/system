@@ -11,6 +11,7 @@ use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 use Liberty\System\Exception\SystemException;
+use Liberty\System\Exception\UnderflowException;
 use Liberty\System\Type\Arrayable;
 use Liberty\System\Utility\Validate;
 use Traversable;
@@ -655,7 +656,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function set(int $index, mixed $item): void
     {
-        assert(Validate::isType($item, $this->itemType()));
+        assert(Validate::isType($item, $this->itemType));
 
         $index = $this->getRealOffset($index);
 
@@ -713,8 +714,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Sets an item at a specific index.
      *
-     * @param int $offset
-     * @param T   $value
+     * @param int|null $offset
+     * @param T        $value
      *
      * @throws SystemException When the requested index is out of bounds
      *
@@ -725,6 +726,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     {
         if ($offset === null) {
             $this->add($value);
+
+            return;
         }
 
         assert(Validate::isInt($offset));
@@ -759,12 +762,12 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @return T
      *
-     * @throws SystemException When the list is empty
+     * @throws UnderflowException When the list is empty
      */
     public function head(): mixed
     {
         if ($this->isEmpty()) {
-            throw new SystemException('List underflow');
+            throw new UnderflowException('List underflow');
         }
 
         $key = array_key_first($this->items);
@@ -777,12 +780,12 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      *
      * @return ArrayList<T>|ArrayList
      *
-     * @throws SystemException When the list is empty
+     * @throws UnderflowException When the list is empty
      */
     public function tail(): ArrayList
     {
         if ($this->isEmpty()) {
-            throw new SystemException('List underflow');
+            throw new UnderflowException('List underflow');
         }
 
         $items = $this->items;

@@ -11,6 +11,7 @@ use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 use Liberty\System\Exception\SystemException;
+use Liberty\System\Exception\UnderflowException;
 use Liberty\System\Type\Arrayable;
 use Liberty\System\Utility\Validate;
 use Traversable;
@@ -86,7 +87,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Appends an item to the list.
      *
-     * @param T          $item
+     * @param T $item
      *
      * @phpstan-assert T $item
      */
@@ -216,6 +217,18 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     }
 
     /**
+     * Applies a callback function to every item.
+     *
+     * @param callable(T, int): void $callback
+     */
+    public function each(callable $callback): void
+    {
+        foreach ($this->items as $index => $item) {
+            call_user_func($callback, $item, $index);
+        }
+    }
+
+    /**
      * Creates a collection from the results of a function.
      *
      * @template U
@@ -301,18 +314,6 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
         }
 
         return [$list1, $list2];
-    }
-
-    /**
-     * Applies a callback function to every item.
-     *
-     * @param callable(T, int): void $callback
-     */
-    public function each(callable $callback): void
-    {
-        foreach ($this->items as $index => $item) {
-            call_user_func($callback, $item, $index);
-        }
     }
 
     /**
@@ -587,71 +588,6 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     }
 
     /**
-     * Retrieves an item at a specific index.
-     *
-     * @return T
-     *
-     * @throws SystemException When the requested index is out of bounds
-     */
-    public function get(int $index): mixed
-    {
-        $index = $this->getRealOffset($index);
-
-        return $this->items[$index];
-    }
-
-    /**
-     * Sets an item at a specific index.
-     *
-     * @param int        $index
-     * @param T          $item
-     *
-     * @throws SystemException When the requested index is out of bounds
-     *
-     * @phpstan-assert T $item
-     */
-    public function set(int $index, mixed $item): void
-    {
-        assert(Validate::isType($item, $this->itemType()));
-
-        $index = $this->getRealOffset($index);
-
-        $this->items[$index] = $item;
-    }
-
-    /**
-     * Checks if an index is in bounds.
-     */
-    public function has(int $index): bool
-    {
-        $count = count($this->items);
-
-        if ($index < -$count || $index > $count - 1) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Removes an item at a specific index.
-     */
-    public function remove(int $index): void
-    {
-        $count = count($this->items);
-
-        if ($index < -$count || $index > $count - 1) {
-            return;
-        }
-
-        if ($index < 0) {
-            $index += $count;
-        }
-
-        array_splice($this->items, $index, 1);
-    }
-
-    /**
      * Checks if an item is in the list.
      *
      * @param T    $item   The item
@@ -697,7 +633,72 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Retrieves an item at a specific index.
      *
-     * @param int          $offset
+     * @return T
+     *
+     * @throws SystemException When the requested index is out of bounds
+     */
+    public function get(int $index): mixed
+    {
+        $index = $this->getRealOffset($index);
+
+        return $this->items[$index];
+    }
+
+    /**
+     * Sets an item at a specific index.
+     *
+     * @param int $index
+     * @param T   $item
+     *
+     * @throws SystemException When the requested index is out of bounds
+     *
+     * @phpstan-assert T $item
+     */
+    public function set(int $index, mixed $item): void
+    {
+        assert(Validate::isType($item, $this->itemType));
+
+        $index = $this->getRealOffset($index);
+
+        $this->items[$index] = $item;
+    }
+
+    /**
+     * Checks if an index is in bounds.
+     */
+    public function has(int $index): bool
+    {
+        $count = count($this->items);
+
+        if ($index < -$count || $index > $count - 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Removes an item at a specific index.
+     */
+    public function remove(int $index): void
+    {
+        $count = count($this->items);
+
+        if ($index < -$count || $index > $count - 1) {
+            return;
+        }
+
+        if ($index < 0) {
+            $index += $count;
+        }
+
+        array_splice($this->items, $index, 1);
+    }
+
+    /**
+     * Retrieves an item at a specific index.
+     *
+     * @param int $offset
      *
      * @throws SystemException When the requested index is out of bounds
      *
@@ -713,8 +714,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     /**
      * Sets an item at a specific index.
      *
-     * @param int               $offset
-     * @param T                 $value
+     * @param int|null $offset
+     * @param T        $value
      *
      * @throws SystemException When the requested index is out of bounds
      *
@@ -725,6 +726,8 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
     {
         if ($offset === null) {
             $this->add($value);
+
+            return;
         }
 
         assert(Validate::isInt($offset));
@@ -758,13 +761,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      * Retrieves the head of the list.
      *
      * @return T
-     * @throws SystemException When the list is empty
      *
+     * @throws UnderflowException When the list is empty
      */
     public function head(): mixed
     {
         if ($this->isEmpty()) {
-            throw new SystemException('List underflow');
+            throw new UnderflowException('List underflow');
         }
 
         $key = array_key_first($this->items);
@@ -776,13 +779,13 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      * Retrieves the tail of the list.
      *
      * @return ArrayList<T>|ArrayList
-     * @throws SystemException When the list is empty
      *
+     * @throws UnderflowException When the list is empty
      */
     public function tail(): ArrayList
     {
         if ($this->isEmpty()) {
-            throw new SystemException('List underflow');
+            throw new UnderflowException('List underflow');
         }
 
         $items = $this->items;

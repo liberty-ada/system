@@ -42,9 +42,6 @@ final class FastHasher
             case 'array':
                 $string = sprintf('a_%s', serialize($value));
                 break;
-            case 'NULL':
-                $string = 'null';
-                break;
             default:
                 $string = '0';
                 break;

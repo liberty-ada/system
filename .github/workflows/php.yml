@@ -1,0 +1,56 @@
+name: System Library Build
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+    - release/*
+  pull_request:
+    branches:
+    - develop
+    - master
+    - release/*
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system:
+        - ubuntu-latest
+        php-versions:
+        - 8.3
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      env:
+        debug: true
+        update: true
+      with:
+        php-version: ${{ matrix.php-versions }}
+        ini-file: development
+        extensions: mbstring, intl, imagick, simplexml, xml, pdo_sqlite, mysql, zip
+        coverage: xdebug
+        tools: cs2pr, phpcs, phplint, phpunit
+
+    - name: Print PHP version
+      run: php -v
+
+    - name: Install Composer Dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Run PHPLint
+      run: phplint src --verbose --no-cache --no-configuration
+
+    - name: Run PHPUnit Tests
+      run: phpunit --configuration etc/build --do-not-cache-result
+
+    - name: Run PHPUnit Coverage Check
+      run: php tests/coverage.php 95
+
+    - name: Run PHP CodeStyle Checks
+      run: phpcs -q --report=checkstyle --standard=PSR12 src | cs2pr

@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Liberty\System\Type;
 
 use JsonSerializable;
+use Liberty\System\Exception\DomainException;
+use Liberty\System\Serialization\Serializable;
 use Liberty\System\Utility\ClassName;
 use Liberty\System\Utility\Validate;
 
 /**
  * Class Type
  */
-final readonly class Type implements Equatable, JsonSerializable
+final readonly class Type implements Equatable, JsonSerializable, Serializable
 {
     /**
      * Constructs Type.
@@ -28,6 +30,18 @@ final readonly class Type implements Equatable, JsonSerializable
     public static function of(object|string $object): Type
     {
         return new self(ClassName::canonical($object));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function arrayDeserialize(array $data): Type
+    {
+        if (!isset($data['name'])) {
+            throw new DomainException('Invalid Type Data');
+        }
+
+        return new self(ClassName::canonical($data['name']));
     }
 
     /**
@@ -108,5 +122,13 @@ final readonly class Type implements Equatable, JsonSerializable
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function arraySerialize(): array
+    {
+        return ['name' => $this->name];
     }
 }

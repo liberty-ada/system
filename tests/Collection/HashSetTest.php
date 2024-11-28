@@ -15,7 +15,7 @@ class HashSetTest extends UnitTestCase
 {
     public function test_that_it_is_empty_by_default(): void
     {
-        static::assertTrue(HashSet::of('string')->isEmpty());
+        self::assertTrue(HashSet::of('string')->isEmpty());
     }
 
     public function test_that_item_type_returns_expected_value(): void
@@ -33,7 +33,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->add('foo');
 
-        static::assertSame(2, count($set));
+        self::assertSame(2, count($set));
     }
 
     public function test_that_contains_returns_true_when_item_is_in_the_set(): void
@@ -42,7 +42,7 @@ class HashSetTest extends UnitTestCase
         $set->add('foo');
         $set->add('bar');
 
-        static::assertTrue($set->contains('bar'));
+        self::assertTrue($set->contains('bar'));
     }
 
     public function test_that_contains_returns_false_when_item_is_not_in_the_set(): void
@@ -51,7 +51,7 @@ class HashSetTest extends UnitTestCase
         $set->add('foo');
         $set->add('bar');
 
-        static::assertFalse($set->contains('baz'));
+        self::assertFalse($set->contains('baz'));
     }
 
     public function test_that_contains_returns_false_after_item_is_removed(): void
@@ -61,7 +61,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->remove('foo');
 
-        static::assertFalse($set->contains('foo'));
+        self::assertFalse($set->contains('foo'));
     }
 
     public function test_that_difference_returns_empty_set_from_same_instances(): void
@@ -75,7 +75,7 @@ class HashSetTest extends UnitTestCase
 
         $difference = $set->difference($set);
 
-        static::assertTrue($difference->isEmpty());
+        self::assertTrue($difference->isEmpty());
     }
 
     public function test_that_difference_returns_expected_set(): void
@@ -110,7 +110,7 @@ class HashSetTest extends UnitTestCase
             }
         }
 
-        static::assertTrue($valid);
+        self::assertTrue($valid);
     }
 
     public function test_that_intersection_returns_expected_set(): void
@@ -145,7 +145,7 @@ class HashSetTest extends UnitTestCase
             }
         }
 
-        static::assertTrue($valid);
+        self::assertTrue($valid);
     }
 
     public function test_that_complement_returns_empty_set_from_same_instances(): void
@@ -159,7 +159,7 @@ class HashSetTest extends UnitTestCase
 
         $complement = $set->complement($set);
 
-        static::assertTrue($complement->isEmpty());
+        self::assertTrue($complement->isEmpty());
     }
 
     public function test_that_complement_returns_expected_set(): void
@@ -194,7 +194,7 @@ class HashSetTest extends UnitTestCase
             }
         }
 
-        static::assertTrue($valid);
+        self::assertTrue($valid);
     }
 
     public function test_that_union_returns_expected_set(): void
@@ -229,7 +229,7 @@ class HashSetTest extends UnitTestCase
             }
         }
 
-        static::assertTrue($valid);
+        self::assertTrue($valid);
     }
 
     public function test_that_each_calls_callback_with_each_item(): void
@@ -245,7 +245,7 @@ class HashSetTest extends UnitTestCase
             $output->add($item);
         });
 
-        static::assertCount(3, $output->toArray());
+        self::assertCount(3, $output->toArray());
     }
 
     public function test_that_map_returns_expected_set(): void
@@ -265,7 +265,7 @@ class HashSetTest extends UnitTestCase
             $data[] = $item;
         }
 
-        static::assertSame([3], $data);
+        self::assertSame([3], $data);
     }
 
     public function test_that_max_returns_expected_value(): void
@@ -276,7 +276,7 @@ class HashSetTest extends UnitTestCase
         $set->add(8936);
         $set->add(2345);
 
-        static::assertSame(8936, $set->max());
+        self::assertSame(8936, $set->max());
     }
 
     public function test_that_max_returns_expected_value_with_callback(): void
@@ -286,7 +286,7 @@ class HashSetTest extends UnitTestCase
         $set->add(['age' => 32]);
         $set->add(['age' => 26]);
 
-        static::assertSame(['age' => 32], $set->max(function (array $data) {
+        self::assertSame(['age' => 32], $set->max(function (array $data) {
             return $data['age'];
         }));
     }
@@ -299,7 +299,7 @@ class HashSetTest extends UnitTestCase
         $set->add(8936);
         $set->add(2345);
 
-        static::assertSame(2345, $set->min());
+        self::assertSame(2345, $set->min());
     }
 
     public function test_that_min_returns_expected_value_with_callback(): void
@@ -309,7 +309,7 @@ class HashSetTest extends UnitTestCase
         $set->add(['age' => 32]);
         $set->add(['age' => 26]);
 
-        static::assertSame(['age' => 19], $set->min(function (array $data) {
+        self::assertSame(['age' => 19], $set->min(function (array $data) {
             return $data['age'];
         }));
     }
@@ -321,12 +321,12 @@ class HashSetTest extends UnitTestCase
         $set->add(2);
         $set->add(3);
 
-        static::assertSame(6, $set->sum());
+        self::assertSame(6, $set->sum());
     }
 
     public function test_that_sum_returns_null_with_empty_set(): void
     {
-        static::assertNull(HashSet::of('int')->sum());
+        self::assertNull(HashSet::of('int')->sum());
     }
 
     public function test_that_sum_returns_expected_value_with_callback(): void
@@ -336,7 +336,7 @@ class HashSetTest extends UnitTestCase
         $set->add(['age' => 32]);
         $set->add(['age' => 26]);
 
-        static::assertSame(77, $set->sum(function (array $data) {
+        self::assertSame(77, $set->sum(function (array $data) {
             return $data['age'];
         }));
     }
@@ -348,12 +348,12 @@ class HashSetTest extends UnitTestCase
         $set->add(2);
         $set->add(3);
 
-        static::assertEquals(2.0, $set->average());
+        self::assertEquals(2.0, $set->average());
     }
 
     public function test_that_average_returns_null_with_empty_set(): void
     {
-        static::assertNull(HashSet::of('int')->average());
+        self::assertNull(HashSet::of('int')->average());
     }
 
     public function test_that_average_returns_expected_value_with_callback(): void
@@ -363,7 +363,7 @@ class HashSetTest extends UnitTestCase
         $set->add(['age' => 31]);
         $set->add(['age' => 26]);
 
-        static::assertEquals(25.0, $set->average(function (array $data) {
+        self::assertEquals(25.0, $set->average(function (array $data) {
             return $data['age'];
         }));
     }
@@ -379,7 +379,7 @@ class HashSetTest extends UnitTestCase
             return substr($item, 0, 1) === 'b';
         });
 
-        static::assertSame('bar', $item);
+        self::assertSame('bar', $item);
     }
 
     public function test_that_find_returns_null_when_item_not_found(): void
@@ -393,7 +393,7 @@ class HashSetTest extends UnitTestCase
             return substr($item, 0, 1) === 'c';
         });
 
-        static::assertNull($item);
+        self::assertNull($item);
     }
 
     public function test_that_filter_returns_expected_set(): void
@@ -413,7 +413,7 @@ class HashSetTest extends UnitTestCase
             $data[] = $item;
         }
 
-        static::assertCount(2, $data);
+        self::assertCount(2, $data);
     }
 
     public function test_that_reject_returns_expected_set(): void
@@ -433,7 +433,7 @@ class HashSetTest extends UnitTestCase
             $data[] = $item;
         }
 
-        static::assertSame(['foo'], $data);
+        self::assertSame(['foo'], $data);
     }
 
     public function test_that_any_returns_true_when_an_item_passes_test(): void
@@ -443,7 +443,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->add('baz');
 
-        static::assertTrue($set->any(function ($item) {
+        self::assertTrue($set->any(function ($item) {
             return $item === 'foo';
         }));
     }
@@ -455,7 +455,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->add('baz');
 
-        static::assertFalse($set->any(function ($item) {
+        self::assertFalse($set->any(function ($item) {
             return $item === 'buz';
         }));
     }
@@ -467,7 +467,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->add('baz');
 
-        static::assertTrue($set->every(function ($item) {
+        self::assertTrue($set->every(function ($item) {
             return strlen($item) === 3;
         }));
     }
@@ -479,7 +479,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->add('baz');
 
-        static::assertFalse($set->every(function ($item) {
+        self::assertFalse($set->every(function ($item) {
             return substr($item, 0, 1) === 'b';
         }));
     }
@@ -507,7 +507,7 @@ class HashSetTest extends UnitTestCase
             $data2[] = $item;
         }
 
-        static::assertTrue(count($data1) === 2 && count($data2) === 1);
+        self::assertTrue(count($data1) === 2 && count($data2) === 1);
     }
 
     public function test_to_array_returns_expected_value(): void
@@ -520,7 +520,7 @@ class HashSetTest extends UnitTestCase
         $items = ['foo', 'bar', 'baz'];
         $array = $set->toArray();
 
-        static::assertTrue(
+        self::assertTrue(
             in_array('foo', $array)
             && in_array('bar', $array)
             && in_array('baz', $array)
@@ -534,7 +534,7 @@ class HashSetTest extends UnitTestCase
         $set->add('bar');
         $set->add('baz');
 
-        static::assertSame('["foo","bar","baz"]', json_encode($set));
+        self::assertSame('["foo","bar","baz"]', json_encode($set));
     }
 
     public function test_that_clone_include_nested_collection(): void
@@ -552,12 +552,12 @@ class HashSetTest extends UnitTestCase
             $set->remove($i);
         }
 
-        static::assertSame($items, $copy->toArray());
+        self::assertSame($items, $copy->toArray());
     }
 
     public function test_that_add_triggers_assert_error_for_invalid_item_type(): void
     {
-        static::expectException(AssertionError::class);
+        self::expectException(AssertionError::class);
 
         HashSet::of('int')->add('string');
     }

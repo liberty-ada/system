@@ -281,8 +281,8 @@ final class LinkedStack implements Arrayable, Countable, IteratorAggregate, Json
     {
         $items = [];
 
-        foreach ($this->getIterator() as $item) {
-            $item[] = $item;
+        foreach ($this->list as $item) {
+            $items[] = $item;
         }
 
         return $items;

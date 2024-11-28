@@ -9,5 +9,5 @@ namespace Liberty\System;
  */
 final class Library
 {
-    public const string VERSION = '0.1.1';
+    public const string VERSION = '0.2.0';
 }

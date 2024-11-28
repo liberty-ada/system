@@ -656,7 +656,7 @@ final class ArrayList implements Arrayable, ArrayAccess, Countable, IteratorAggr
      */
     public function set(int $index, mixed $item): void
     {
-        assert(Validate::isType($item, $this->itemType()));
+        assert(Validate::isType($item, $this->itemType));
 
         $index = $this->getRealOffset($index);
 

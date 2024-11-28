@@ -18,6 +18,14 @@ class HashSetTest extends UnitTestCase
         static::assertTrue(HashSet::of('string')->isEmpty());
     }
 
+    public function test_that_item_type_returns_expected_value(): void
+    {
+        $itemType = 'string';
+        $set = HashSet::of($itemType);
+
+        self::assertSame($itemType, $set->itemType());
+    }
+
     public function test_that_duplicate_items_do_not_affect_count(): void
     {
         $set = HashSet::of('string');

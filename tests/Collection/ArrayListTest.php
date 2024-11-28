@@ -19,6 +19,14 @@ class ArrayListTest extends UnitTestCase
         self::assertTrue(ArrayList::of('string')->isEmpty());
     }
 
+    public function test_that_item_type_returns_expected_value(): void
+    {
+        $itemType = 'string';
+        $list = ArrayList::of($itemType);
+
+        self::assertSame($itemType, $list->itemType());
+    }
+
     public function test_that_added_items_affect_count(): void
     {
         $list = ArrayList::of('string');

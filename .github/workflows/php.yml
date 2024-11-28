@@ -49,6 +49,8 @@ jobs:
     - name: Run PHPUnit Tests
       run: phpunit --configuration etc/build --do-not-cache-result
 
+    - name: Run PHPUnit Coverage Check
+      run: php tests/coverage.php 95
+
     - name: Run PHP CodeStyle Checks
       run: phpcs -q --report=checkstyle --standard=PSR12 src | cs2pr
-

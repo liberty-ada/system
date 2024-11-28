@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Unused Symfony Finder dependency
+
 ## [0.2.0] - 2024-11-28
 
 ### Added
